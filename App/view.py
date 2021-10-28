@@ -36,10 +36,17 @@ operación solicitada
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Inicializar catalogo")
+    print("2- Cargar informacion")
+    print("3- Contar los avistamientos en una ciudad->Req 1")
+    print("4- Contar los avistamientos por duracion->Req 2")
+    print("5- Contar avistamientos por Hora/Minutos del día->Req 3")
+    print("6- Contar los avistamientos en un rango de fechas->Req 4")
+    print("7- Contar los avistamientos de una Zona Geográfica->Req 5")
+    print("8- Visualizar los avistamientos de una zona geográfica->Bono")
 
-catalog = None
+catalogo = None
+ufofile = 'UFOS-utf8-small.csv'
 
 """
 Menu principal
@@ -48,10 +55,32 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
+        print("Inicializando catalogo...")
+        catalogo = controller.iniciar_catalogo()
+
 
     elif int(inputs[0]) == 2:
-        pass
+        print("Cargando información de los archivos ....")
+        controller.loadData(catalogo, ufofile)
+        print("El total de avistamientos cargados son: "+str(lt.size(catalogo["lista_ufos"])))
+        i = 1
+        l = lt.newList("ARRAY_LIST")
+        lst = catalogo['lista_ufos']
+        print("Los primeros cinco avistamientos: ")
+        while i <= 5:
+            ufo = lt.getElement(lst, i)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nPaís: " + ufo["country"]
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nForma del objeto: " + ufo["shape"])
+            uf = lt.lastElement(lst)
+            lt.removeLast(lst)
+            lt.addFirst(l, uf)
+            i += 1
+        
+        print("Los últimos cinco avistamientos: ")
+        for u in lt.iterator(l):
+            print("\nDatatime: " + str(u["datetime"]) + "\nCiudad: " + u["city"] + "\nPaís: " + u["country"]
+                    + "\nDuración (segundos): " + str(u["duration (seconds)"]) + "\nForma del objeto: " + u["shape"])
+
 
     else:
         sys.exit(0)
