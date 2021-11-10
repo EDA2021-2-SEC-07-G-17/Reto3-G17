@@ -58,3 +58,9 @@ def avistamientos_ciudad(catalogo, ciudad):
 def avistamientos_duracion(catalogo, lim1, lim2):
     maximo, contador, listado = model.avistamientos_duracion(catalogo,lim1,lim2)
     return maximo, contador, listado
+def avistamientos_Hora(catalogo, lim1, lim2):
+    maximo, contador, listado = model.avistamientos_Hora(catalogo,lim1,lim2)
+    return maximo, contador, listado 
+def avistamientos_Fecha(catalogo, lim1, lim2):
+    maximo, contador, listado = model.avistamientos_Fecha(catalogo,lim1,lim2)
+    return maximo, contador, listado        
