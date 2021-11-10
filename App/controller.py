@@ -50,3 +50,11 @@ def loadData(catalogo, ufosfile):
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def avistamientos_ciudad(catalogo, ciudad):
+    total, contador, avistamientos = model.avistamientos_ciudad(catalogo, ciudad)
+    return total, contador, avistamientos
+
+def avistamientos_duracion(catalogo, lim1, lim2):
+    maximo, contador, listado = model.avistamientos_duracion(catalogo,lim1,lim2)
+    return maximo, contador, listado

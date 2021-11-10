@@ -25,6 +25,7 @@
  """
 
 
+from os import _AddedDllDirectory
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -45,23 +46,29 @@ los mismos.
 def init_catalog():
     catalog = {
         "ufos":None,
-        "lista_ufos":None
+        "lista_ufos":None,
+        "duration":None,
+        "ciudades":None
     }
 
     catalog["ufos"] = om.newMap(omaptype="RBT",comparefunction=compareDates)
     catalog["lista_ufos"] = lt.newList(datastructure="SINGLE_LINKED")
+    catalog["duration"] = om.newMap(omaptype="RBT",comparefunction=comparar_duraciones)
+    catalog["ciudades"] = om.newMap(omaptype="RBT")
 
     return catalog
 
 # Funciones para agregar informacion al catalogo
 def ufo_lista(catalog, ufo):
-    lt.addLast(catalog["lista_ufos"],ufo)
+    lt.addLast(catalog["lista_ufos"], ufo)
+    addDuration(catalog, ufo)
+    addCity(catalog, ufo)
 
 def addufo(catalog, ufo):
     fecha_ufo = ufo["datetime"]
     existencia = om.get(catalog["ufos"],fecha_ufo)
     if existencia is None:
-        lista_ufos = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=compareDates)
+        lista_ufos = lt.newList(datastructure="SINGLE_LINKED")
         lt.addLast(lista_ufos,ufo)
         om.put(catalog["ufos"],fecha_ufo,lista_ufos)
     else:
@@ -69,11 +76,79 @@ def addufo(catalog, ufo):
         lt.addLast(lista,ufo)
         om.put(catalog["ufos"],fecha_ufo,lista)
 
+def addDuration(catalog, ufo):
+    mapa = catalog["duration"]
+    duracion = ufo["duration (seconds)"]
+
+    existencia = om.get(mapa,duracion)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED",cmpfunction=comparar_duraciones)
+        lt.addLast(bucket, ufo)
+        om.put(mapa, duracion, bucket)
+    else:
+        bucket_e = me.getValue(existencia)
+        lt.addLast(bucket_e, ufo)
+        ordenar_ciudades_alfabeticamente(bucket_e)
+        om.put(mapa, duracion, bucket_e)
+    
+    return mapa
+
+def addCity(catalog, ufo):
+    mapa = catalog["ciudades"]
+    ciudad = ufo["city"]
+
+    existencia = om.get(mapa,ciudad)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED",cmpfunction=comparar_ciudades)
+        lt.addLast(bucket, ufo)
+        om.put(mapa, ciudad, bucket)
+    else:
+        bucket_e = me.getValue(existencia)
+        lt.addLast(bucket_e, ufo)
+        ordenar_fechas(bucket_e)
+        om.put(mapa, ciudad, bucket_e)
+    
+    return mapa
 
 
 # Funciones para creacion de datos
 
 # Funciones de consulta
+
+def avistamientos_ciudad(catalog, ciudad):
+    mapa = catalog["ciudades"]
+
+    ciudades = om.keySet(mapa)
+    total = lt.size(ciudades)
+    ciu = om.get(mapa,ciudad)
+    avistamientos = me.getValue(ciu)
+    contador = lt.size(avistamientos)
+    
+    return total, contador, avistamientos
+
+def avistamientos_duracion(catalog, lim1, lim2):
+    mapa = catalog["duration"]
+    maximo = om.maxKey(mapa)
+    tupla_maximo = om.get(mapa, maximo)
+    bucket_maximo = me.getValue(tupla_maximo)
+    
+    contador = lt.size(bucket_maximo)
+
+    lista_rango = om.keys(mapa, float(lim1), float(lim2))
+
+    lista_final = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=comparar_duraciones)
+
+    for key in lt.iterator(lista_rango):
+        ufo = om.get(mapa, key)
+        bucket = me.getValue(ufo)
+        
+        for e in lt.iterator(bucket):
+            lt.addLast(lista_final, e)
+
+    return maximo, contador, lista_final
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -95,8 +170,37 @@ def comparara_fechas(ufo1, ufo2):
     date2 = strptime(date2, '%Y-%m-%d %H:%M:%S')
     return date1 < date2
 
+def comparar_duraciones(d1, d2):
+    if (float(d1) == float(d2)):
+        return 0
+    elif (float(d1) > float(d2)):
+        return 1
+    else:
+        return -1
+
+def comparar_ciudades(ciu1, ciu2):
+    ciudad1 = ciu1["city"]
+    ciudad2 = ciu2["city"]
+    lista = [str(ciudad1),str(ciudad2)]
+    orden = ordenar_alfabeticamente(lista)
+
+    if str(ciudad1) == orden[0]:
+        return True
+    else:
+        return False
+
 # Funciones de ordenamiento
 
 def ordenar_fechas(lst):
     mg.sort(lst, comparara_fechas)
     return lst
+
+def ordenar_ciudades_alfabeticamente(lst):
+    mg.sort(lst, comparar_ciudades)
+    return lst
+
+# Funciones de apoyo
+
+def ordenar_alfabeticamente(lista):
+    lista.sort()
+    return lista
