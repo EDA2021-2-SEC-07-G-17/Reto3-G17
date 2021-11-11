@@ -163,6 +163,7 @@ while True:
         lat_max = input("Escriba el limite maximo de la latitud: ")
         long_min = input("Escriba el limite minimo de la longitud: ")
         long_max = input("Escriba el limite maximo de la longitud: ")
+        tiempo_inicio=time.process_time()
 
         contador, listado = controller.avistamientos_zona(catalogo, round(float(lat_min),2), round(float(lat_max),2), round(float(long_min),2), round(float(long_max),2))
 
@@ -222,7 +223,9 @@ while True:
                     + "\nPaís: " + n["country"] + "\nForma del objeto: " + n["shape"] 
                     + "\nDuración (segundos): " + str(n["duration (seconds)"]) + "\nLatitud " + n["latitude"] 
                     + "\nLongitud " + n["longitude"])
-
+        tiempo_fin=time.process_time()
+        TimeMseg=(tiempo_fin-tiempo_inicio)*1000
+        print (TimeMseg)
 
     elif int(inputs[0]) == 6:
         lim = input("Escriba el limite inferior en formato (AAAA-MM-DD): ")
