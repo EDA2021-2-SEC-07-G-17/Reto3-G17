@@ -277,7 +277,7 @@ while True:
         print("\n")
         print("El avistamiento que ocurrio mas tarde fue a las: "+str(maximo)+" y ocurrió: "+str(contador)+" vez/veces")
         print("\n")
-        print("Hay "+str(tamaño)+" avistamientos entre "+str(lim)+" y "+str(lim2)+" segundos")
+        print("Hay "+str(tamaño)+" avistamientos entre las "+str(lim)+" y las"+str(lim2))
         
         i = 1
         lst = lt.newList("ARRAY_LIST")
