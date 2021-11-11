@@ -48,7 +48,7 @@ def printMenu():
     print("8- Visualizar los avistamientos de una zona geográfica->Bono")
 
 catalogo = None
-ufofile = 'UFOS-utf8-large.csv'
+ufofile = 'UFOS-utf8-small.csv'
 
 """
 Menu principal
@@ -279,5 +279,8 @@ while True:
         for h in lt.iterator(lst):
             print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
                 + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
-                + "\nForma del objeto: " + h["shape"] )            
+                + "\nForma del objeto: " + h["shape"] )
+
+    else:
+        sys.exit(0)       
 sys.exit(0)
