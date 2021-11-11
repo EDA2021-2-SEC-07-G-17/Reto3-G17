@@ -49,7 +49,9 @@ def init_catalog():
         "lista_ufos":None,
         "duration":None,
         "ciudades":None,
-        "longitud":None
+        "longitud":None,
+        "hora/minuto":None,
+        "fecha":None
     }
 
     catalog["ufos"] = om.newMap(omaptype="RBT",comparefunction=compareDates)
@@ -57,6 +59,8 @@ def init_catalog():
     catalog["duration"] = om.newMap(omaptype="RBT",comparefunction=comparar_duraciones)
     catalog["ciudades"] = om.newMap(omaptype="RBT")
     catalog["longitud"] = om.newMap(omaptype="RBT")
+    catalog["hora/minuto"] = om.newMap(omaptype="RBT")
+    catalog["fecha"] = om.newMap(omaptype="RBT")
 
     return catalog
 
@@ -66,6 +70,8 @@ def ufo_lista(catalog, ufo):
     addDuration(catalog, ufo)
     addCity(catalog, ufo)
     addLongitud(catalog, ufo)
+    addHora(catalog, ufo)
+    addFecha(catalog, ufo)
 
 def addufo(catalog, ufo):
     fecha_ufo = ufo["datetime"]
@@ -96,6 +102,40 @@ def addDuration(catalog, ufo):
         om.put(mapa, duracion, bucket_e)
     
     return mapa
+def addHora(catalog, ufo):
+    mapa = catalog["hora/minuto"]
+    fecha = (ufo["datetime"].split())[1]
+
+    existencia = om.get(mapa,fecha)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED",cmpfunction=comparar_hora)
+        lt.addLast(bucket, ufo)
+        om.put(mapa, fecha, bucket)
+    else:
+        bucket_e = me.getValue(existencia)
+        lt.addLast(bucket_e, ufo)
+        ordenar_fechas(bucket_e)
+        om.put(mapa, fecha, bucket_e)
+    
+    return mapa 
+def addFecha(catalog, ufo):
+    mapa = catalog["fecha"]
+    fecha = ufo["datetime"].split()[0]
+
+    existencia = om.get(mapa,fecha)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED",cmpfunction=comparar_hora)
+        lt.addLast(bucket, ufo)
+        om.put(mapa, fecha, bucket)
+    else:
+        bucket_e = me.getValue(existencia)
+        lt.addLast(bucket_e, ufo)
+        ordenar_fechas(bucket_e)
+        om.put(mapa, fecha, bucket_e)
+    
+    return mapa        
 
 def addCity(catalog, ufo):
     mapa = catalog["ciudades"]
@@ -171,6 +211,47 @@ def avistamientos_duracion(catalog, lim1, lim2):
             lt.addLast(lista_final, e)
 
     return maximo, contador, lista_final
+def avistamientos_Hora(catalog, lim1, lim2):
+    mapa = catalog["hora/minuto"]
+    maximo = om.maxKey(mapa)
+    tupla_maximo = om.get(mapa, maximo)
+    bucket_maximo = me.getValue(tupla_maximo)
+    
+    contador = lt.size(bucket_maximo)
+
+    lista_rango = om.keys(mapa, lim1,lim2)
+
+    lista_final = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=comparar_hora)
+
+    for key in lt.iterator(lista_rango):
+        ufo = om.get(mapa, key)
+        bucket = me.getValue(ufo)
+        
+        for e in lt.iterator(bucket):
+            lt.addLast(lista_final, e)
+
+    return maximo, contador, lista_final
+def avistamientos_Fecha(catalog, lim1, lim2):
+    mapa = catalog["fecha"]
+    maximo = om.minKey(mapa)
+    tupla_maximo = om.get(mapa, maximo)
+    bucket_maximo = me.getValue(tupla_maximo)
+    
+    contador = lt.size(bucket_maximo)
+
+    lista_rango = om.keys(mapa, lim1,lim2)
+
+    lista_final = lt.newList(datastructure="SINGLE_LINKED", cmpfunction=comparar_hora)
+
+    for key in lt.iterator(lista_rango):
+        ufo = om.get(mapa, key)
+        bucket = me.getValue(ufo)
+        
+        for e in lt.iterator(bucket):
+            lt.addLast(lista_final, e)
+
+    return maximo, contador, lista_final
+
 
 def avistamientos_zona_geografica(catalogo, lat_min, lat_max, long_min, long_max):
     mapa = catalogo["longitud"]
@@ -245,6 +326,14 @@ def comparar_latitudes(ufo1, ufo2):
     avis2 = round(float(avis2), 2)
 
     return avis1 < avis2
+    
+def comparar_hora(d1, d2):
+    if (d1 == d2):
+        return 0
+    elif (d1[1] > d2[1]):
+        return 1
+    else:
+        return -1        
 
 # Funciones de ordenamiento
 
@@ -255,6 +344,7 @@ def ordenar_fechas(lst):
 def ordenar_ciudades_alfabeticamente(lst):
     mg.sort(lst, comparar_ciudades)
     return lst
+    
 
 def ordenar_latitudes(lst):
     mg.sort(lst, comparar_latitudes)

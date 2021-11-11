@@ -126,7 +126,7 @@ while True:
         print("\n")
         print("El avistamiento mas largo duró: "+str(maximo)+" seg y ocurrió: "+str(contador)+" vez/veces")
         print("\n")
-        print("Hay "+str(tamaño)+" avistamientos entre "+str(lim1)+" y "+str(lim2)+" segundos")
+        print("Hay "+str(tamaño)+" avistamientos entre "+str(lim1)+" y "+str(lim2))
         
         i = 1
         lst = lt.newList("ARRAY_LIST")
@@ -214,6 +214,70 @@ while True:
                     + "\nLongitud " + n["longitude"])
 
 
-    else:
-        sys.exit(0)
+    elif int(inputs[0]) == 6:
+        lim = input("Escriba el limite inferior en formato (AAAA-MM-DD): ")
+        lim2 = input("Escriba el limite superior formato (AAAA-MM-DD): ")
+        lim3=lim2+"24:60:01"
+        maximo, contador, listado = controller.avistamientos_Fecha(catalogo,lim,lim3)
+
+        avistamientos = lt.size(listado)
+        tamaño = lt.size(listado)
+
+        print("\n")
+        print("El avistamiento que ocurrio mas tarde fue a las: "+str(maximo)+" y ocurrió: "+str(contador)+" vez/veces")
+        print("\n")
+        print("Hay "+str(tamaño)+" avistamientos entre "+str(lim)+" y "+str(lim2))
+        
+        i = 1
+        lst = lt.newList("ARRAY_LIST")
+        print("\n")
+        print("Los primeros 3 avistamientos en el rango son: ")
+        while i <= 3:
+            ufo = lt.getElement(listado, i)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                + "\nPaís: " + ufo["country"] + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) 
+                + "\nForma del objeto: " + ufo["shape"] )
+            ultimo = lt.lastElement(listado)
+            lt.removeLast(listado)
+            lt.addFirst(lst, ultimo)
+            i+=1
+        print("\n")
+        print("Los ultimos 3 avistamientos en el rango: ")
+        for h in lt.iterator(lst):
+            print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
+                + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
+                + "\nForma del objeto: " + h["shape"] )
+    elif int(inputs[0]) == 5:
+        lim = input("Escriba el limite inferior en formato (horas:minutos): ")
+        lim2 = input("Escriba el limite superior formato (horas:minutos): ")
+        lim3=lim2+":01"
+        maximo, contador, listado = controller.avistamientos_Hora(catalogo,lim,lim3)
+
+        avistamientos = lt.size(listado)
+        tamaño = lt.size(listado)
+
+        print("\n")
+        print("El avistamiento que ocurrio mas tarde fue a las: "+str(maximo)+" y ocurrió: "+str(contador)+" vez/veces")
+        print("\n")
+        print("Hay "+str(tamaño)+" avistamientos entre "+str(lim)+" y "+str(lim2)+" segundos")
+        
+        i = 1
+        lst = lt.newList("ARRAY_LIST")
+        print("\n")
+        print("Los primeros 3 avistamientos en el rango son: ")
+        while i <= 3:
+            ufo = lt.getElement(listado, i)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                + "\nPaís: " + ufo["country"] + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) 
+                + "\nForma del objeto: " + ufo["shape"] )
+            ultimo = lt.lastElement(listado)
+            lt.removeLast(listado)
+            lt.addFirst(lst, ultimo)
+            i+=1
+        print("\n")
+        print("Los ultimos 3 avistamientos en el rango: ")
+        for h in lt.iterator(lst):
+            print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
+                + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
+                + "\nForma del objeto: " + h["shape"] )            
 sys.exit(0)
