@@ -48,8 +48,9 @@ def init_catalog():
         "ufos":None,
         "lista_ufos":None,
         "duration":None,
-        "hora/minuto":None,
         "ciudades":None,
+        "longitud":None,
+        "hora/minuto":None,
         "fecha":None
     }
 
@@ -57,6 +58,7 @@ def init_catalog():
     catalog["lista_ufos"] = lt.newList(datastructure="SINGLE_LINKED")
     catalog["duration"] = om.newMap(omaptype="RBT",comparefunction=comparar_duraciones)
     catalog["ciudades"] = om.newMap(omaptype="RBT")
+    catalog["longitud"] = om.newMap(omaptype="RBT")
     catalog["hora/minuto"] = om.newMap(omaptype="RBT")
     catalog["fecha"] = om.newMap(omaptype="RBT")
 
@@ -67,6 +69,7 @@ def ufo_lista(catalog, ufo):
     lt.addLast(catalog["lista_ufos"], ufo)
     addDuration(catalog, ufo)
     addCity(catalog, ufo)
+    addLongitud(catalog, ufo)
     addHora(catalog, ufo)
     addFecha(catalog, ufo)
 
@@ -152,6 +155,26 @@ def addCity(catalog, ufo):
     
     return mapa
 
+def addLongitud(catalog, ufo):
+    mapa = catalog["longitud"]
+    longitud = round(float(ufo["longitude"]),2)
+
+
+    existencia = om.get(mapa, longitud)
+
+    if existencia is None:
+        bucket = lt.newList(datastructure="SINGLE_LINKED")
+        lt.addLast(bucket, ufo)
+        om.put(mapa, longitud, bucket)
+    else:
+        bucket_e = me.getValue(existencia)
+        lt.addLast(bucket_e, ufo)
+        ordenar_latitudes(bucket_e)
+        om.put(mapa, longitud, bucket_e)
+    
+    return mapa
+
+
 
 # Funciones para creacion de datos
 
@@ -230,6 +253,30 @@ def avistamientos_Fecha(catalog, lim1, lim2):
     return maximo, contador, lista_final
 
 
+def avistamientos_zona_geografica(catalogo, lat_min, lat_max, long_min, long_max):
+    mapa = catalogo["longitud"]
+
+    llaves = om.keys(mapa,long_min,long_max)
+
+    if long_max < long_min:
+        llaves = om.keys(mapa,long_max,long_min)
+    listado = lt.newList(datastructure="SINGLE_LINKED")
+
+    for key in lt.iterator(llaves):
+        entry = om.get(mapa,key)
+        bucket = me.getValue(entry)
+        for e in lt.iterator(bucket):
+            latitud = round(float(e["latitude"]),2)
+            if latitud <= lat_max and latitud >= lat_min:
+                lt.addLast(listado, e)
+    
+    contador = lt.size(listado)
+    return contador, listado
+
+
+
+
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -262,13 +309,24 @@ def comparar_duraciones(d1, d2):
 def comparar_ciudades(ciu1, ciu2):
     ciudad1 = ciu1["city"]
     ciudad2 = ciu2["city"]
-    lista = [str(ciudad1),str(ciudad2)]
-    orden = ordenar_alfabeticamente(lista)
+    return ciudad1 < ciudad2
 
-    if str(ciudad1) == orden[0]:
-        return True
-    else:
-        return False
+def comparar_longitudes(ufo1, ufo2):
+    avis1 = ufo1["longitude"]
+    avis1 = round(float(avis1), 2)
+    avis2 = ufo2["longitude"]
+    avis2 = round(float(avis2), 2)
+
+    return avis1 < avis2
+    
+def comparar_latitudes(ufo1, ufo2):
+    avis1 = ufo1["latitude"]
+    avis1 = round(float(avis1), 2)
+    avis2 = ufo2["latitude"]
+    avis2 = round(float(avis2), 2)
+
+    return avis1 < avis2
+    
 def comparar_hora(d1, d2):
     if (d1 == d2):
         return 0
@@ -288,8 +346,7 @@ def ordenar_ciudades_alfabeticamente(lst):
     return lst
     
 
-# Funciones de apoyo
+def ordenar_latitudes(lst):
+    mg.sort(lst, comparar_latitudes)
+    return lst
 
-def ordenar_alfabeticamente(lista):
-    lista.sort()
-    return lista

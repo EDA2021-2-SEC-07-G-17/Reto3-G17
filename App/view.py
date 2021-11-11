@@ -42,8 +42,8 @@ def printMenu():
     print("1- Inicializar catalogo")
     print("2- Cargar informacion")
     print("3- Contar los avistamientos en una ciudad->Req 1")
-    print("4- Contar los avistamientos por duracion->Req 2")
-    print("5- Contar avistamientos por Hora/Minutos del día->Req 3")
+    print("4- Contar los avistamientos por duracion->Req 2-Sebastián Casanova")
+    print("5- Contar avistamientos por Hora/Minutos del día->Req 3-Jaime Alfonso")
     print("6- Contar los avistamientos en un rango de fechas->Req 4")
     print("7- Contar los avistamientos de una Zona Geográfica->Req 5")
     print("8- Visualizar los avistamientos de una zona geográfica->Bono")
@@ -158,6 +158,71 @@ while True:
         TimeMseg=(tiempo_fin-tiempo_inicio)*1000
         print (TimeMseg)        
 
+    elif int(inputs[0]) == 7:
+        lat_min = input("Escriba el limite minimo de la latitud: ")
+        lat_max = input("Escriba el limite maximo de la latitud: ")
+        long_min = input("Escriba el limite minimo de la longitud: ")
+        long_max = input("Escriba el limite maximo de la longitud: ")
+
+        contador, listado = controller.avistamientos_zona(catalogo, round(float(lat_min),2), round(float(lat_max),2), round(float(long_min),2), round(float(long_max),2))
+
+        print("\n")
+        print("En el rango especificado hay "+str(contador)+" avistamientos")
+        print("\n")
+
+        lst = lt.newList("ARRAY_LIST")
+        
+        if int(contador) >= 10:
+            i = 1
+            print("Los primeros 5 avistamientos en el rango son: ")
+            while i <= 5:
+                ufo = lt.getElement(listado, i)
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                    + "\nPaís: " + ufo["country"] + "\nForma del objeto: " + ufo["shape"] 
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nLatitud " + ufo["latitude"] 
+                    + "\nLongitud " + ufo["longitude"])
+                ultimo = lt.lastElement(listado)
+                lt.removeLast(listado)
+                lt.addFirst(lst, ultimo)
+                i+=1
+            print("\n")
+            print("Los ultimos 5 avistamientos en el rango: ")
+            for h in lt.iterator(lst):
+                print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
+                    + "\nPaís: " + h["country"] + "\nForma del objeto: " + h["shape"] 
+                    + "\nDuración (segundos): " + str(h["duration (seconds)"]) + "\nLatitud " + h["latitude"] 
+                    + "\nLongitud " + h["longitude"])
+            
+        elif int(contador) == 1:
+            ufo = lt.getElement(listado,1)
+            print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                    + "\nPaís: " + ufo["country"] + "\nForma del objeto: " + ufo["shape"] 
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nLatitud " + ufo["latitude"] 
+                    + "\nLongitud " + ufo["longitude"])
+        
+        elif int(contador) < 10 and int(contador) != 1:
+            j=1
+            mitad = int(contador/2)
+            print("Los primeros "+ str(mitad) +" avistamientos en el rango son: ")  
+            while j <= mitad:
+                ufo = lt.getElement(listado, j)
+                print("\nDatatime: " + str(ufo["datetime"]) + "\nCiudad: " + ufo["city"] + "\nEstado: " + ufo["state"] 
+                    + "\nPaís: " + ufo["country"] + "\nForma del objeto: " + ufo["shape"] 
+                    + "\nDuración (segundos): " + str(ufo["duration (seconds)"]) + "\nLatitud " + ufo["latitude"] 
+                    + "\nLongitud " + ufo["longitude"])
+                ultimo = lt.lastElement(listado)
+                lt.removeLast(listado)
+                lt.addFirst(lst, ultimo)
+                j+=1
+
+            print("\n")
+            print("Los ultimos "+ str(mitad) +" avistamientos en el rango son: ")
+            for n in lt.iterator(lst):
+                print("\nDatatime: " + str(n["datetime"]) + "\nCiudad: " + n["city"] + "\nEstado: " + n["state"] 
+                    + "\nPaís: " + n["country"] + "\nForma del objeto: " + n["shape"] 
+                    + "\nDuración (segundos): " + str(n["duration (seconds)"]) + "\nLatitud " + n["latitude"] 
+                    + "\nLongitud " + n["longitude"])
+
 
     elif int(inputs[0]) == 6:
         lim = input("Escriba el limite inferior en formato (AAAA-MM-DD): ")
@@ -232,5 +297,8 @@ while True:
                 + "\nForma del objeto: " + h["shape"] )  
         tiempo_fin=time.process_time()
         TimeMseg=(tiempo_fin-tiempo_inicio)*1000
-        print (TimeMseg)                  
+        print (TimeMseg)        
+
+    else:
+        sys.exit(0)       
 sys.exit(0)
