@@ -26,6 +26,7 @@ import controller
 from DISClib.ADT import list as lt
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
+import time 
 assert cf
 
 
@@ -86,7 +87,9 @@ while True:
 
     
     elif int(inputs[0]) == 3:
+        
         ciudad = input("Escriba la ciudad de la cual quiera saber los avistamientos registrados: ")
+        tiempo_inicio=time.process_time()
 
         total, contador, listado = controller.avistamientos_ciudad(catalogo, ciudad)
 
@@ -114,11 +117,15 @@ while True:
             print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
                 + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
                 + "\nForma del objeto: " + h["shape"] )
+        tiempo_fin=time.process_time()
+        TimeMseg=(tiempo_fin-tiempo_inicio)*1000
+        print (TimeMseg)        
     
     elif int(inputs[0]) == 4:
         lim1 = input("Escriba el limite inferior en segundos: ")
         lim2 = input("Escriba el limite superior en segundos: ")
         maximo, contador, listado = controller.avistamientos_duracion(catalogo,lim1,lim2)
+        tiempo_inicio=time.process_time()
 
         avistamientos = lt.size(listado)
         tamaño = lt.size(listado)
@@ -147,6 +154,9 @@ while True:
             print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
                 + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
                 + "\nForma del objeto: " + h["shape"] )
+        tiempo_fin=time.process_time()
+        TimeMseg=(tiempo_fin-tiempo_inicio)*1000
+        print (TimeMseg)        
 
     elif int(inputs[0]) == 7:
         lat_min = input("Escriba el limite minimo de la latitud: ")
@@ -218,6 +228,7 @@ while True:
         lim = input("Escriba el limite inferior en formato (AAAA-MM-DD): ")
         lim2 = input("Escriba el limite superior formato (AAAA-MM-DD): ")
         lim3=lim2+"24:60:01"
+        tiempo_inicio=time.process_time()
         maximo, contador, listado = controller.avistamientos_Fecha(catalogo,lim,lim3)
 
         avistamientos = lt.size(listado)
@@ -247,10 +258,14 @@ while True:
             print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
                 + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
                 + "\nForma del objeto: " + h["shape"] )
+        tiempo_fin=time.process_time()
+        TimeMseg=(tiempo_fin-tiempo_inicio)*1000
+        print (TimeMseg)        
     elif int(inputs[0]) == 5:
         lim = input("Escriba el limite inferior en formato (horas:minutos): ")
         lim2 = input("Escriba el limite superior formato (horas:minutos): ")
         lim3=lim2+":01"
+        tiempo_inicio=time.process_time()
         maximo, contador, listado = controller.avistamientos_Hora(catalogo,lim,lim3)
 
         avistamientos = lt.size(listado)
@@ -279,7 +294,10 @@ while True:
         for h in lt.iterator(lst):
             print("\nDatatime: " + str(h["datetime"]) + "\nCiudad: " + h["city"] + "\nEstado: " + h["state"] 
                 + "\nPaís: " + h["country"] + "\nDuración (segundos): " + str(h["duration (seconds)"]) 
-                + "\nForma del objeto: " + h["shape"] )
+                + "\nForma del objeto: " + h["shape"] )  
+        tiempo_fin=time.process_time()
+        TimeMseg=(tiempo_fin-tiempo_inicio)*1000
+        print (TimeMseg)        
 
     else:
         sys.exit(0)       
